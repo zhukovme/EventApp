@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171007204503) do
+ActiveRecord::Schema.define(version: 20171008153144) do
 
   create_table "events", force: :cascade do |t|
     t.text "title", null: false
@@ -48,6 +48,17 @@ ActiveRecord::Schema.define(version: 20171007204503) do
     t.boolean "hasSpeakers", default: false, null: false
     t.boolean "hasProducts", default: false, null: false
     t.boolean "hasIndustryNews", default: false, null: false
+  end
+
+  create_table "news_posts", force: :cascade do |t|
+    t.text "title", null: false
+    t.text "category", null: false
+    t.text "rubric"
+    t.text "event_name"
+    t.text "image_url"
+    t.text "web_url"
+    t.datetime "date", null: false
+    t.text "description"
   end
 
 end
