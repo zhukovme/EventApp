@@ -27,18 +27,17 @@ class CreateEvents < ActiveRecord::Migration[5.1]
       t.text :instagram
       t.text :tumblr
       t.text :youtube
-      t.boolean :hasReg
-      t.boolean :hasParty
-      t.boolean :hasMaps
-      t.boolean :hasSponsors
-      t.boolean :hasPartner
-      t.boolean :hasPress
-      t.boolean :hasTimeTable
-      t.boolean :hasSpeakers
-      t.boolean :hasProducts
-      t.boolean :hasIndustryNews
+      t.boolean :hasReg, null: false, default: false
+      t.boolean :hasParty, null: false, default: false
+      t.boolean :hasMaps, null: false, default: false
+      t.boolean :hasSponsors, null: false, default: false
+      t.boolean :hasPartner, null: false, default: false
+      t.boolean :hasPress, null: false, default: false
+      t.boolean :hasTimeTable, null: false, default: false
+      t.boolean :hasSpeakers, null: false, default: false
+      t.boolean :hasProducts, null: false, default: false
+      t.boolean :hasIndustryNews, null: false, default: false
 
-      t.timestamps
     end
   end
 end

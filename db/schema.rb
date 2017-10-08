@@ -38,18 +38,16 @@ ActiveRecord::Schema.define(version: 20171007204503) do
     t.text "instagram"
     t.text "tumblr"
     t.text "youtube"
-    t.boolean "hasReg"
-    t.boolean "hasParty"
-    t.boolean "hasMaps"
-    t.boolean "hasSponsors"
-    t.boolean "hasPartner"
-    t.boolean "hasPress"
-    t.boolean "hasTimeTable"
-    t.boolean "hasSpeakers"
-    t.boolean "hasProducts"
-    t.boolean "hasIndustryNews"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.boolean "hasReg", default: false, null: false
+    t.boolean "hasParty", default: false, null: false
+    t.boolean "hasMaps", default: false, null: false
+    t.boolean "hasSponsors", default: false, null: false
+    t.boolean "hasPartner", default: false, null: false
+    t.boolean "hasPress", default: false, null: false
+    t.boolean "hasTimeTable", default: false, null: false
+    t.boolean "hasSpeakers", default: false, null: false
+    t.boolean "hasProducts", default: false, null: false
+    t.boolean "hasIndustryNews", default: false, null: false
   end
 
 end
