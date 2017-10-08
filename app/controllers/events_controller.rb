@@ -5,8 +5,7 @@ class EventsController < ApplicationController
     category = parse_category params[:category]
     limit = parse_limit params[:limit]
 
-    events = Event.select(:id, :title, :category, :location, :image_url, 
-        :date_start, :date_end)
+    events = Event.select(preview_attributes)
 
     if date
       events = events.where(date_start: date.midnight..date.end_of_day)
@@ -59,6 +58,10 @@ class EventsController < ApplicationController
   end
 
   private
+
+  def preview_attributes
+    [:id, :title, :category, :location, :image_url, :date_start, :date_end]
+  end
 
   def parse_date date
     begin
