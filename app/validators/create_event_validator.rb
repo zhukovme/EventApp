@@ -1,4 +1,4 @@
-class UpdateEventValidator
+class CreateEventValidator
   include ActiveModel::Model
 
   attr_accessor :title, :category, :location, :description_short, 
@@ -8,17 +8,10 @@ class UpdateEventValidator
     :youtube, :hasReg, :hasParty, :hasMaps, :hasSponsors, :hasPartner, 
     :hasPress, :hasTimeTable, :hasSpeakers, :hasProducts, :hasIndustryNews
 
-  validate :any_not_nil_is_not_blank
+  validates :title, :category, presence: true
 
   def reason
     errors.full_messages[0]
-  end
-
-  private
-  def any_not_nil_is_not_blank
-    if (!title.nil? && title.blank?) || (!category.nil? && category.blank?)
-      errors[:base] << "event_is_not_valid"
-    end
   end
   
 end
