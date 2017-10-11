@@ -6,8 +6,8 @@ class EventsController < ApplicationController
     limit = parse_limit(params[:limit])
 
     events = Event.select(preview_attributes)
-    events = events.where(date_start: date.midnight..date.end_of_day)
-      .or(events.where(date_end: date.midnight..date.end_of_day)) if date
+    events = events.where("date_start <= ?", date.end_of_day) if date
+    events = events.where("date_end >= ?", date.midnight) if date
     events = events.where(category: categories) if categories
     events = events.limit(limit) if limit
 
