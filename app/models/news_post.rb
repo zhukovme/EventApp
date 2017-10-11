@@ -1,2 +1,2 @@
-class NewsPost < ApplicationRecord
+class NewsPost < ActiveRecord::Base
 end

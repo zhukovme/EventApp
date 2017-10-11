@@ -1,75 +1,64 @@
 class EventsController < ApplicationController
-
   def index
     date = parse_date(params[:date])
     categories = parse_categories(params[:categories])
     limit = parse_limit(params[:limit])
 
-    events = Event.select(preview_attributes)
-    events = events.where("date_start <= ?", date.end_of_day) if date
-    events = events.where("date_end >= ?", date.midnight) if date
+    events = Event.select(index_columns)
+    events = events.where('date_start <= ?', date.end_of_day) if date
+    events = events.where('date_end >= ?', date.midnight) if date
     events = events.where(category: categories) if categories
     events = events.limit(limit) if limit
 
-    render_200(events: events)
+    render_ok(events: events)
   end
 
   def show
     event = Event.find(params[:id])
-    render_200(event: event)
+    render_ok(event: event)
   end
 
   def create
-    validator = CreateEventValidator.new(params[:event])
+    validator = CreateEventValidator.new(params)
     if validator.valid?
-      Event.new(params[:event]).save!
-      render_200()
+      Event.new(validator.event_params).save!
+      render_ok
     else
-      render_400(reason: validator.reason)
+      render_error(:bad_request, reason: validator.reason)
     end
   end
 
   def update
-    validator = UpdateEventValidator.new(params[:event])
+    validator = UpdateEventValidator.new(params)
     if validator.valid?
-      Event.find(params[:id]).update(params.fetch(:event, {}))
-      render_200()
+      Event.find(validator.params[:id]).update!(validator.event_params)
+      render_ok
     else
-      render_400(reason: validator.reason)
+      render_error(:bad_request, reason: validator.reason)
     end
   end
 
   def destroy
     event = Event.find(params[:id])
-    if event.destroy
-      render_200()
-    else
-      render_500()
-    end
+    event.destroy!
+    render_ok
   end
 
   private
 
-  def preview_attributes
-    [:id, :title, :category, :location, :image_url, :date_start, :date_end]
+  def index_columns
+    %i[id title category location image_url date_start date_end]
   end
 
   def parse_date(date)
-    Date.parse(params[:date]) if params[:date].present? rescue nil
+    Time.zone.parse(date.strip) if date.present? rescue nil
   end
 
   def parse_categories(categories)
-    if categories.present? && categories.is_a?(Array)
-      categories.map { |category| category.strip }
-    end
+    categories.map(&:strip) if categories.present? && categories.is_a?(Array)
   end
 
   def parse_limit(limit)
-    limit.strip if is_number?(limit)
+    limit.strip if number?(limit)
   end
-
-  def is_number?(string)
-    true if Integer(string) rescue false
-  end
-
 end

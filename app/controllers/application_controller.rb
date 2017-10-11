@@ -5,30 +5,25 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::RoutingError, with: :routing_error
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
 
-  def render_200(content = {})
-    render json: content, status: 200
+  def render_ok(content = {})
+    render json: content, status: :ok
   end
 
-  def render_400(content = { reason: "bad_request" })
-    render json: content, status: 400
+  def render_error(status, content = {reason: :unexpected_error})
+    render json: content, status: status
   end
 
-  def render_404(content = { reason: "not_found" })
-    render json: content, status: 404
-  end
-
-  def render_500(content = { reason: "internal_server_error" })
-    render json: content, status: 500
+  def number?(string)
+    true if Integer(string) rescue false
   end
 
   private
-
+  
   def routing_error
-    render_404
+    render_error(:bad_request, reason: :bad_request)
   end
 
   def record_not_found
-    render_404
+    render_error(:not_found, reason: :not_found)
   end
-
 end

@@ -11,7 +11,7 @@ module EventsApp
 
     config.action_controller.permit_all_parameters = true
 
-    config.autoload_paths += %W(#{config.root}/app/validators)
+    config.autoload_paths += Dir[Rails.root.join('app', 'validators', '{**}')]
 
   end
 end

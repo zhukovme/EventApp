@@ -1,68 +1,57 @@
 class NewsPostsController < ApplicationController
-
   def index
     categories = parse_categories(params[:categories])
     limit = parse_limit(params[:limit])
 
-    news_posts = NewsPost.select(preview_attributes)
+    news_posts = NewsPost.select(index_columns)
     news_posts = news_posts.where(category: categories) if categories
     news_posts = news_posts.limit(limit) if limit
 
-    render_200(news_posts: news_posts)
+    render_ok(news_posts: news_posts)
   end
 
   def show
     news_post = NewsPost.find(params[:id])
-    render_200(news_post: news_post)
+    render_ok(news_post: news_post)
   end
 
   def create
-    validator = CreateNewsPostValidator.new(params[:news_post])
+    validator = CreateNewsPostValidator.new(params)
     if validator.valid?
-      NewsPost.new(params[:news_post]).save!
-      render_200()
+      NewsPost.new(validator.news_post_params).save!
+      render_ok
     else
-      render_400(reason: validator.reason)
+      render_error(:bad_request, reason: validator.reason)
     end
   end
 
   def update
-    validator = UpdateNewsPostValidator.new(params[:news_post])
+    validator = UpdateNewsPostValidator.new(params)
     if validator.valid?
-      NewsPost.find(params[:id]).update(params.fetch(:news_post, {}))
-      render_200()
+      NewsPost.find(validator.params[:id]).update!(validator.news_post_params)
+      render_ok
     else
-      render_400(reason: validator.reason)
+      render_error(:bad_request, reason: validator.reason)
     end
   end
 
   def destroy
     news_post = NewsPost.find(params[:id])
-    if news_post.destroy
-      render_200()
-    else
-      render_500()
-    end
+    news_post.destroy!
+    render_ok
   end
 
   private
 
-  def preview_attributes
-    [:id, :title, :category, :rubric, :event_name, :image_url, :web_url, :date]
+  def index_columns
+    %i[id title category rubric event_name image_url web_url date]
   end
 
   def parse_categories(categories)
-    if categories.present? && categories.is_a?(Array)
-      categories.map { |category| category.strip }
-    end
+    categories.map(&:strip) if categories.present? && categories.is_a?(Array)
   end
 
   def parse_limit(limit)
-    limit.strip if is_number?(limit)
+    limit.strip if number?(limit)
   end
-
-  def is_number?(string)
-    true if Integer(string) rescue false
-  end
-
 end
