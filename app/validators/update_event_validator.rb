@@ -8,17 +8,22 @@ class UpdateEventValidator
     :youtube, :hasReg, :hasParty, :hasMaps, :hasSponsors, :hasPartner, 
     :hasPress, :hasTimeTable, :hasSpeakers, :hasProducts, :hasIndustryNews
 
-  validate :any_not_nil_is_not_blank
+  validate :any_nil_or_not_blank
 
   def reason
     errors.full_messages[0]
   end
 
   private
-  def any_not_nil_is_not_blank
-    if (!title.nil? && title.blank?) || (!category.nil? && category.blank?)
-      errors[:base] << "event_is_not_valid"
+
+  def any_nil_or_not_blank
+    unless (nil_or_not_blank?(title) && nil_or_not_blank?(category))
+        errors[:base] << "event_is_not_valid"
     end
   end
-  
+
+  def nil_or_not_blank?(param)
+    param.nil? || !param.blank?
+  end
+
 end

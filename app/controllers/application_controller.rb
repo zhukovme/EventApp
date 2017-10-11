@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
   def routing_error
     render_404
   end

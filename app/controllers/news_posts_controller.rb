@@ -1,54 +1,47 @@
 class NewsPostsController < ApplicationController
 
   def index
-    category = parse_category params[:category]
-    limit = parse_limit params[:limit]
+    categories = parse_categories(params[:categories])
+    limit = parse_limit(params[:limit])
 
     news_posts = NewsPost.select(preview_attributes)
+    news_posts = news_posts.where(category: categories) if categories
+    news_posts = news_posts.limit(limit) if limit
 
-    if category
-      news_posts = news_posts.where(category: category)
-    end
-    if limit
-      news_posts = news_posts.limit(limit)
-    end
-
-    render_200 news_posts: news_posts
+    render_200(news_posts: news_posts)
   end
 
   def show
     news_post = NewsPost.find(params[:id])
-    render_200 news_post: news_post
+    render_200(news_post: news_post)
   end
 
   def create
-    # validator = CreateNewsPostValidator.new(params[:news_post])
-    # if validator.valid?
-      NewsPost.new(params[:news_post])
-        .save
-      render_200
-    # else
-      # render_400 reason: validator.reason
-    # end
+    validator = CreateNewsPostValidator.new(params[:news_post])
+    if validator.valid?
+      NewsPost.new(params[:news_post]).save!
+      render_200()
+    else
+      render_400(reason: validator.reason)
+    end
   end
 
   def update
-    # validator = UpdateNewsPostValidator.new(params[:news_post])
-    # if validator.valid?
-      NewsPost.find(params[:id])
-        .update(params.fetch(:news_post, {}))
-      render_200
-    # else
-      # render_400 reason: validator.reason
-    # end
+    validator = UpdateNewsPostValidator.new(params[:news_post])
+    if validator.valid?
+      NewsPost.find(params[:id]).update(params.fetch(:news_post, {}))
+      render_200()
+    else
+      render_400(reason: validator.reason)
+    end
   end
 
   def destroy
     news_post = NewsPost.find(params[:id])
-    if NewsPost.destroy
-      render_200
+    if news_post.destroy
+      render_200()
     else
-      render_500
+      render_500()
     end
   end
 
@@ -58,15 +51,17 @@ class NewsPostsController < ApplicationController
     [:id, :title, :category, :rubric, :event_name, :image_url, :web_url, :date]
   end
 
-  def parse_category category
-    category.present? ? category.delete("/\s/").split(',') : nil
+  def parse_categories(categories)
+    if categories.present? && categories.is_a?(Array)
+      categories.map { |category| category.strip }
+    end
   end
 
-  def parse_limit limit
-    is_number?(limit) ? limit.delete("/\s/") : nil
+  def parse_limit(limit)
+    limit.strip if is_number?(limit)
   end
 
-  def is_number? string
+  def is_number?(string)
     true if Integer(string) rescue false
   end
 
