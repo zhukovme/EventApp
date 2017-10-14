@@ -1,7 +1,9 @@
 class CreateNewsPostValidator < NewsPostValidator
   attr_reader :title, :category, :date
 
-  validates :title, :category, :date, presence: true
+  validates :title, presence: { message: 'title_is_missing' }
+  validates :category, presence: { message: 'category_is_missing' }
+  validates :date, presence: { message: 'date_is_missing' }
 
   def initialize(params)
     super(params)

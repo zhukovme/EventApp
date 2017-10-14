@@ -1,7 +1,8 @@
 class CreateEventValidator < EventValidator
   attr_reader :title, :category
 
-  validates :title, :category, presence: true
+  validates :title, presence: { message: 'title_is_missing' }
+  validates :category, presence: { message: 'category_is_missing' }
 
   def initialize(params)
     super(params)
