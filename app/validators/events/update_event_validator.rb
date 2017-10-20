@@ -1,22 +1,13 @@
-class UpdateEventValidator < EventValidator
+class UpdateEventValidator < Validator
   attr_reader :title, :category
 
-  validate :any_nil_or_not_blank
+  validates :title, presence: { message: 'title_is_missing' },
+    allow_nil: :true
+  validates :category, presence: { message: 'category_is_missing' },
+    allow_nil: :true
 
-  def initialize(params)
-    super(params)
+  def initialize(event_params)
     @title = event_params[:title]
     @category = event_params[:category]
-  end
-
-  private
-
-  def any_nil_or_not_blank
-    errors[:base] << 'event_is_not_valid' unless nil_or_not_blank?(title) &&
-                                                 nil_or_not_blank?(category)
-  end
-
-  def nil_or_not_blank?(param)
-    param.nil? || !param.blank?
   end
 end

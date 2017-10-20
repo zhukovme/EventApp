@@ -19,9 +19,9 @@ class EventsController < ApplicationController
   end
 
   def create
-    validator = CreateEventValidator.new(params)
+    validator = CreateEventValidator.new(event_params)
     if validator.valid?
-      Event.new(validator.event_params).save!
+      Event.new(event_params).save!
       render_ok
     else
       render_error(:bad_request, reason: validator.reason)
@@ -29,9 +29,9 @@ class EventsController < ApplicationController
   end
 
   def update
-    validator = UpdateEventValidator.new(params)
+    validator = UpdateEventValidator.new(event_params)
     if validator.valid?
-      Event.find(validator.params[:id]).update!(validator.event_params)
+      Event.find(params[:id]).update!(event_params)
       render_ok
     else
       render_error(:bad_request, reason: validator.reason)
@@ -40,8 +40,11 @@ class EventsController < ApplicationController
 
   def destroy
     event = Event.find(params[:id])
-    event.destroy!
-    render_ok
+    if event.destroy
+      render_ok
+    else
+      render_error(:internal_server_error)
+    end
   end
 
   private
@@ -60,5 +63,10 @@ class EventsController < ApplicationController
 
   def parse_limit(limit)
     limit.strip if number?(limit)
+  end
+
+  def event_params
+    (params[:event] || {})
+      .select { |x| Event.attribute_names.index(x.to_s) }
   end
 end

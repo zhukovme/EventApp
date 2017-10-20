@@ -16,9 +16,9 @@ class NewsPostsController < ApplicationController
   end
 
   def create
-    validator = CreateNewsPostValidator.new(params)
+    validator = CreateNewsPostValidator.new(news_post_params)
     if validator.valid?
-      NewsPost.new(validator.news_post_params).save!
+      NewsPost.new(news_post_params).save!
       render_ok
     else
       render_error(:bad_request, reason: validator.reason)
@@ -26,9 +26,9 @@ class NewsPostsController < ApplicationController
   end
 
   def update
-    validator = UpdateNewsPostValidator.new(params)
+    validator = UpdateNewsPostValidator.new(news_post_params)
     if validator.valid?
-      NewsPost.find(validator.params[:id]).update!(validator.news_post_params)
+      NewsPost.find(params[:id]).update!(news_post_params)
       render_ok
     else
       render_error(:bad_request, reason: validator.reason)
@@ -37,8 +37,11 @@ class NewsPostsController < ApplicationController
 
   def destroy
     news_post = NewsPost.find(params[:id])
-    news_post.destroy!
-    render_ok
+    if news_post.destroy
+      render_ok
+    else
+      render_error(:internal_server_error)
+    end
   end
 
   private
@@ -53,5 +56,10 @@ class NewsPostsController < ApplicationController
 
   def parse_limit(limit)
     limit.strip if number?(limit)
+  end
+
+  def news_post_params
+    (params[:news_post] || {})
+      .select { |x| NewsPost.attribute_names.index(x.to_s) }
   end
 end
