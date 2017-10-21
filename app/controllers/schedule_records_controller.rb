@@ -1,12 +1,12 @@
 class ScheduleRecordsController < ApplicationController
   def index
-    event_id = params[:event_id]
-    if event_id.present?
+    validator = IndexScheduleRecordValidator.new(params)
+    if validator.valid?
       schedule = ScheduleRecord.select(index_columns)
-        .where(event_id: event_id)
+        .where(event_id: validator.event_id)
       render_ok(schedule: schedule)
     else
-      render_error(:bad_request, reason: :event_id_is_missing)
+      render_error(:bad_request, reason: validator.reason)
     end
   end
 
@@ -16,11 +16,11 @@ class ScheduleRecordsController < ApplicationController
   end
 
   def create
-    event_id = params[:event_id]
-    validator = CreateScheduleRecordValidator.new(event_id, 
+    validator = CreateScheduleRecordValidator.new(params,
                                                   schedule_record_params)
     if validator.valid?
-      Event.find(event_id).schedule_records.new(schedule_record_params).save!
+      Event.find(validator.event_id).schedule_records
+        .new(schedule_record_params).save!
       render_ok
     else
       render_error(:bad_request, reason: validator.reason)

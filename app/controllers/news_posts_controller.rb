@@ -1,7 +1,8 @@
 class NewsPostsController < ApplicationController
   def index
-    categories = parse_categories(params[:categories])
-    limit = parse_limit(params[:limit])
+    validator = IndexNewsPostValidator.new(params)
+    categories = validator.categories
+    limit = validator.limit
 
     news_posts = NewsPost.select(index_columns)
     news_posts = news_posts.where(category: categories) if categories
@@ -48,14 +49,6 @@ class NewsPostsController < ApplicationController
 
   def index_columns
     %i[id title category rubric event_name image_url web_url date]
-  end
-
-  def parse_categories(categories)
-    categories.map(&:strip) if categories.present? && categories.is_a?(Array)
-  end
-
-  def parse_limit(limit)
-    limit.strip if number?(limit)
   end
 
   def news_post_params

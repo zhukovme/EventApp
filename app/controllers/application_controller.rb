@@ -13,10 +13,6 @@ class ApplicationController < ActionController::Base
     render json: content, status: status
   end
 
-  def number?(string)
-    true if Integer(string) rescue false
-  end
-
   private
   
   def routing_error
