@@ -5,11 +5,11 @@ class EventsController < ApplicationController
     categories = validator.categories
     limit = validator.limit
 
-    events = Event.select(index_columns)
-    events = events.where('date_start <= ?', date.end_of_day)
-      .where('date_end >= ?', date.midnight) if date
-    events = events.where(category: categories) if categories
-    events = events.limit(limit) if limit
+    events = Event.select(Event.preview_attribute_names)
+    events.where!('date_start <= ?', date.end_of_day)
+      .where!('date_end >= ?', date.midnight) if date
+    events.where!(category: categories) if categories
+    events.limit!(limit) if limit
 
     render_ok(events: events)
   end
@@ -41,21 +41,14 @@ class EventsController < ApplicationController
 
   def destroy
     event = Event.find(params[:id])
-    if event.destroy
-      render_ok
-    else
-      render_error(:internal_server_error)
-    end
+    event.destroy!
+    render_ok
   end
 
   private
 
-  def index_columns
-    %i[id title category location image_url date_start date_end]
-  end
-
   def event_params
     (params[:event] || {})
-      .select { |x| Event.attribute_names.index(x.to_s) }
+      .select { |k, v| Event.attribute_names.include?(k) }
   end
 end

@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
     render json: content, status: :ok
   end
 
-  def render_error(status, content = {reason: :unexpected_error})
+  def render_error(status, content = { reason: :unexpected_error })
     render json: content, status: status
   end
 

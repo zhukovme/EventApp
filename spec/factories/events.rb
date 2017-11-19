@@ -1,4 +1,8 @@
 FactoryBot.define do
+  factory :event_without_required, class: Event do
+    location Faker::Lorem.sentence
+  end
+
   factory :event do
     title Faker::Lorem.sentence
     category Faker::Lorem.word
@@ -13,8 +17,8 @@ FactoryBot.define do
       video_url Faker::Internet.url
       date_start Faker::Date.between(Date.today, 10.days.from_now)
       date_end Faker::Date.between(11.days.from_now, 21.days.from_now)
-      latitude Faker::Address.latitude
-      longitude Faker::Address.longitude
+      latitude Faker::Number.decimal(2, 3)
+      longitude Faker::Number.decimal(2, 3)
       zoom Faker::Number.number(1)
       email Faker::Internet.email
       facebook Faker::Internet.url
@@ -37,16 +41,32 @@ FactoryBot.define do
       hasSpeakers Faker::Boolean.boolean
       hasProducts Faker::Boolean.boolean
       hasIndustryNews Faker::Boolean.boolean
-    end
 
-    factory :event_without_required do
-      title nil
-      category nil
-    end
+      factory :event_today do
+        date_start Faker::Date.between(10.days.ago, 2.days.ago)
+        date_end Faker::Date.between(2.days.from_now, 21.days.from_now)
+      end
 
-    factory :event_empty_required do
-      title ''
-      category ''
+      factory :event_not_today do
+        date_start Faker::Date.between(2.days.from_now, 10.days.from_now)
+        date_end Faker::Date.between(11.days.from_now, 21.days.from_now)
+      end
+
+      factory :event_with_unwanted do
+        some :some
+        unwanted :unwanted
+        data_1 :data_1
+      end
+
+      factory :event_with_null_required do
+        title nil
+        category nil
+      end
+
+      factory :event_empty_required do
+        title ''
+        category ''
+      end
     end
   end
 end
